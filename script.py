@@ -7,7 +7,7 @@ def read_dataset(filename):
 
 def clean_data(df):
   #Replacing the missing values with "N/A"
-  df = df.fillna("N/A", inplace = True)
+  df.fillna("N/A", inplace = True)
   
   #Standardizing gender values to "Male" and "Female"
   df["Gender"] = df["Gender"].replace({"M": "Male", "m": "Male", 
@@ -20,8 +20,8 @@ def transform_data(df):
   df["Age"] = pd.to_numeric(df["Age"], errors='coerce') 
 
   #Calculating the average age for males and females
-  male_avg_age = round(df[df['gender'] == 'Male']['age'].mean(), 2)
-  female_avg_age = round(df[df['gender'] == 'Female']['age'].mean(), 2)  
+  male_avg_age = round(df[df['Gender'] == 'Male']['Age'].mean(), 2)
+  female_avg_age = round(df[df['Gender'] == 'Female']['Age'].mean(), 2)  
 
   #Filling missing age values based on gender-specific averages
   df["Age"].fillna(df.groupby("Gender")["Age"].transform("mean"), inplace = True)
@@ -30,9 +30,9 @@ def transform_data(df):
 
 def analyze_data(df):
   #Calculating the overall and gender-specific average ages
-  overall_avg_age = round(df['age'].mean(), 2)
-  male_avg_age = round(df[df['gender'] == 'Male']['age'].mean(), 2)
-  female_avg_age = round(df[df['gender'] == 'Female']['age'].mean(), 2)
+  overall_avg_age = round(df['Age'].mean(), 2)
+  male_avg_age = round(df[df['Gender'] == 'Male']['Age'].mean(), 2)
+  female_avg_age = round(df[df['Gender'] == 'Female']['Age'].mean(), 2)
  
   #Calculating the age ranges for males and females
   male_age_range = (df[df["Gender"] == "Male"]["Age"].max(), df[df["Gender"] == "Male"]["Age"].min())
@@ -79,7 +79,7 @@ def load_dataset(filename):
 #Class for processing the data
 class DataProcessor:
   #Initializing with the datset
-  def _init_(self, filename):
+  def __init__(self, filename):
     self.df = read_dataset(filename)
 
   #Cleaning the dataset
@@ -114,29 +114,29 @@ def print_report(analysis):
    print(f"Gender Distribution:\n{analysis['gender_distribution']}")
 
 #Main script execution
-if __name__ == "_main_":
+if __name__ == "__main__":
     import sys
     if len(sys.argv) != 2:   
       #Checking if the correct number of arguments are provided
       print("Usage: python script.py <filename>")
       sys.exit(1)
-    
+
     filename = sys.argv[1]
     analyzer = DataAnalyzer(filename)
-    
+
     #Cleaning and transforming the dataset
     analyzer.clean_data()
     analyzer.transform_data()
-    
+
     #Performing analysis and printing the report
     analysis = analyzer.analyze_data()
     advanced_analysis = analyzer.advanced_analysis()
-    
+
     print_report(analysis)
-    
+
     #Saving the cleaned and transformed dataset
     output_filename = "cleaned_" + filename
+    output_filename = filename.replace(".csv","") + "_cleaned.csv"
     analyzer.save_dataset(output_filename)
-    
-    print(f"Cleaned dataset saved to {output_filename}")
-    
+
+    print(f"Cleaned dataset saved to {output_filename}")    
