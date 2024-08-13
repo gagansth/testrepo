@@ -1,4 +1,8 @@
 import pandas as pd
+import warnings
+
+warnings.filterwarnings('ignore')
+
 
 def read_dataset(filename):
   # Reading the CSV file into a pandas DataFrame
@@ -35,8 +39,10 @@ def analyze_data(df):
   female_avg_age = round(df[df['Gender'] == 'Female']['Age'].mean(), 2)
  
   #Calculating the age ranges for males and females
-  male_age_range = (df[df["Gender"] == "Male"]["Age"].max(), df[df["Gender"] == "Male"]["Age"].min())
-  female_age_range = (df[df["Gender"] == "Female"]["Age"].max(), df[df["Gender"] == "Female"]["Age"].min())
+  # male_age_range = (df[df["Gender"] == "Male"]["Age"].max(), df[df["Gender"] == "Male"]["Age"].min())
+  male_age_range = str(round(df[df["Gender"] == "Male"]["Age"].min())) + " - " + str(round(df[df["Gender"] == "Male"]["Age"].max()))
+  # female_age_range = (df[df["Gender"] == "Female"]["Age"].max(), df[df["Gender"] == "Female"]["Age"].min())
+  female_age_range = str(round(df[df["Gender"] == "Female"]["Age"].min())) + " - " + str(round(df[df["Gender"] == "Female"]["Age"].max()))
 
   #Calculating the distribution of genders
   gender_distribution = df["Gender"].value_counts()
@@ -52,7 +58,7 @@ def analyze_data(df):
 
 def advanced_analysis(df, N):
     #Identifying the top N oldest and youngest individuals
-    top_oldest = df.nlargest(N, "Age")
+    top_oldest = df.nlargest(N, "Age", keep="last")
     top_youngest = df.nsmallest(N, "Age")
       
     #Counting the number of individuals within specific age ranges
@@ -101,7 +107,7 @@ class DataAnalyzer(DataProcessor):
     #Performing basic analysis on the dataset
     return analyze_data(self.df)
 
-  def advanced_analysis(self, N = 5):
+  def advanced_analysis(self, N):
     #Performing advanced analysis on the dataset
     return advanced_analysis(self.df, N)
 
@@ -112,6 +118,12 @@ def print_report(analysis):
    print(f"Male Age Range: {analysis['male_age_range']}")
    print(f"Female Age Range: {analysis['female_age_range']}")
    print(f"Gender Distribution:\n{analysis['gender_distribution']}")
+
+def print_report_advanced(advanced_analysis, N):
+   print(f"Top {N} oldest age: \n{advanced_analysis['top_oldest']}")
+   print(f"Top {N} youngest age: \n{advanced_analysis['top_youngest']}")
+   print(f"Age Range & Counts: \n{advanced_analysis['age_range_counts']}")
+   print(f"Occupation Groups: {advanced_analysis['occupation_groups']}")
 
 #Main script execution
 if __name__ == "__main__":
@@ -130,9 +142,10 @@ if __name__ == "__main__":
 
     #Performing analysis and printing the report
     analysis = analyzer.analyze_data()
-    advanced_analysis = analyzer.advanced_analysis()
+    advanced_analysis = analyzer.advanced_analysis(5)
 
     print_report(analysis)
+    print_report_advanced(advanced_analysis,5)
 
     #Saving the cleaned and transformed dataset
     output_filename = "cleaned_" + filename
